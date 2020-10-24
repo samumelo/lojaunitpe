@@ -31,13 +31,29 @@ public class Funcionario implements Serializable {
 	@Temporal (TemporalType.DATE)
 	private Date dataSaida;
 	private String cargo;
-	private String cidade;
+	@ManyToOne
+	private Cidade cidade;
 	private String logadouro;
 	private String numero;
 	private String complemento;
 	private String bairro;
 	private String uf;
 	private String cep;
+	private String email;
+	private String senha; 
+	
+	private String getEmail() {
+		return email;
+	}
+	private void setEmail(String email) {
+		this.email = email;
+	}
+	private String getSenha() {
+		return senha;
+	}
+	private void setSenha(String senha) {
+		this.senha = senha;
+	}
 	private Long getId() {
 		return id;
 	}
@@ -74,10 +90,10 @@ public class Funcionario implements Serializable {
 	private void setCargo(String cargo) {
 		this.cargo = cargo;
 	}
-	private String getCidade() {
+	private Cidade getCidade() {
 		return cidade;
 	}
-	private void setCidade(String cidade) {
+	private void setCidade(Cidade cidade) {
 		this.cidade = cidade;
 	}
 	private String getLogadouro() {

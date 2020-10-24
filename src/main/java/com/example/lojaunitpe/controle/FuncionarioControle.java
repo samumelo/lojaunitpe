@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.lojaunitpe.modelos.Funcionario;
+import com.example.lojaunitpe.repositorios.CidadeRepositorio;
 import com.example.lojaunitpe.repositorios.FucionarioRepositorio;
 
 @Controller
@@ -19,10 +20,14 @@ public class FuncionarioControle {
 	@Autowired
 	private FucionarioRepositorio funcionarioRepositorio;
 	
+	@Autowired
+	private CidadeRepositorio cidadeRepositorio;
+	
 	@GetMapping ("/admintrativo/funcionrio/cadastrar")
     public ModelAndView cadastrar (Funcionario funcionario)	{
 		ModelAndView mv = new ModelAndView ("administrativo/funcionarios/cadastro");
 		mv.addObject("funcionario", funcionario);
+		mv.addObject("listaCidades", cidadeRepositorio.findAll());
 		return mv;
 		
 	}
@@ -41,11 +46,19 @@ public class FuncionarioControle {
 		return cadastrar(funcionario.get());
 	}
 	
+	@GetMapping ("/admintrativo/funcionrio/remover/{id}")
+	public ModelAndView remover (@PathVariable("id") Long id ) {
+		Optional<Funcionario> funcionario = funcionarioRepositorio.findById(id);
+		funcionarioRepositorio.delete(funcionario.get());
+		return listar();
+	}
+	
 	@PostMapping ("/administrativo/funcionarios/salvar")
 	public ModelAndView salvar (@Valid Funcionario funcionario, BindingResult result) {
 		if (result.hasErrors()) {
 			return cadastrar(funcionario);
 		}
+		funcionario.setsenha(new BCryptPasswordEncoder().encode(funcionario.getSenha()));
 		funcionarioRepositorio.saveAndFlush(funcionario);
 		return cadastrar(new Funcionario ());
 	}
