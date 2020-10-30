@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,53 +20,152 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.example.lojaunitpe.modelos.Cliente;
+import com.example.lojaunitpe.modelos.Compra;
+import com.example.lojaunitpe.modelos.ItensCompra;
 import com.example.lojaunitpe.modelos.Produto;
+import com.example.lojaunitpe.repositorios.ClienteRepositorio;
+import com.example.lojaunitpe.repositorios.CompraRepositorio;
 import com.example.lojaunitpe.repositorios.FucionarioRepositorio;
+import com.example.lojaunitpe.repositorios.ItensCompraRepositorio;
 import com.example.lojaunitpe.repositorios.ProdutoRepositorio;
 
 @Controller
 public class CarrinhoControle {
 
 	private List<ItensCompra> itensCompra = new ArrayList<ItensCompra>();
-	
+	private Compra compra = new Compra();
+	private Cliente cliente;
+
 	@Autowired
 	private ProdutoRepositorio repositorioProduto;
-	
-	@GetMapping("/carrinho")
+
+	@Autowired
+	private ClienteRepositorio repositorioCliente;
+
+	@Autowired
+	private CompraRepositorio repositorioCompra;
+
+	@Autowired
+	private ItensCompraRepositorio repositorioItensCompra;
+
+	private void calcularTotal() {
+		compra.setValorTotal(0.);
+		for (ItensCompra it : itensCompra) {
+			compra.setValorTotal(compra.getValorTotal() + it.getValorTotal());
+		}
+	}
+
+	@getMapping("/carrinho")
 	public ModelAndView chamarCarrinho() {
 		ModelAndView mv = new ModelAndView("cliente/carrinho");
+		calcularTotal();
+		mv.addObject("compra", compra);
 		mv.addObject("listaItens", itensCompra);
+		return mv;
+	}
+
+	private void buscarUsuarioLogado() {
+		Authentication autenticado = SecurityContextHolder.getContext().getAunthentication();
+		if (!(autenticado instanceof AnonymousAuthenticationToken)) {
+			String email = autenticado.getName();
+			cliente = RepositorioCliente.buscarCliente(email).get(0);
+		}
+	}
+
+	@getMapping("/finalizar")
+	public ModelAndView finalizarCompra() {
+		ModelAndView mv = new ModelAndView("cliente/finalizar");
+		calcularTotal();
+		mv.addObject("compra", compra);
+		mv.addObject("listaItens", itensCompra);
+		return mv;
+	}
+
+	@getMapping("alterarQuantidade/{id}/{acao}")
+	public String alterarQuantidade(@PathVariable Long id, @PathVariable Integer acao) {
+		ModelAndView mv = new ModelAndView("cliente/carrinho");
+
+		for (ItensCompra it : itensCompra) {
+			if (it.getProduto().getId().equals(id)) {
+				if (acao.equals(1)) {
+					it.setQuantidade(it.getQuantidade() + 1);
+					it.setValorTotal(0.);
+					it.setValorTotal(it.getValorTotal() + (it.getQuantidade() * it.getValorUnitario()));
+				} else if (acao == 0) {
+					it.setQuantidade(it.getQuantidade() - 1);
+					it.setValorTotal(0.);
+					it.setValorTotal(it.getValorTotal() + (it.getQuantidade() * it.getValorUnitario()));
+				}
+				break;
+			}
+		}
+		return "redirect:/carrinho";
+	}
+
+	@getMapping("/removerProduto/{id}")
+	public String removerProduto(@PathVariable Long id) {
+		for (ItensCompra it : itensCompra) {
+			if (it.getProduto().getId().equals(id)) {
+				itensCompra.remove(it);
+				break;
+			}
+		}
+		return "redirect:/carrinho";
+	}
+
+	@getMapping("/finalizar")
+	public ModelAndView finalizarCompra() {
+		buscarUsuarioLogado();
+		ModelAndView mv = new ModelAndView("cliente/finalizar");
+		calcularTotal();
+		mv.addObjetct("compra", compra);
+		mv.addObject("listaItens", itensCompra);
+		mv.addObject("cliente", cliente);
+		return mv;
+	}
+
+	@PostMapping("/finalizar/confirmar")
+	public ModelAndView confirmar(String formaPagamento) {
+		ModelAndView mv = new ModelAndView("cliente/mensagemFinalizou");
+		compra.setCliente(cliente);
+		compra.setFormaPagamento(formaPagamento);
+		repositorioCompra.saveAndFlush(compra);
+
+		for (ItensCompra c : itensCompra) {
+			c.setCompra(compra);
+			repositorioItensCompra.saveAndFlush(c);
+		}
+		itensCompra = new ArrayList<>();
+		compra = new Compra();
 		return mv;
 
 	}
-	
-	@GetMapping("/adicionarCarrinho/{id}")
-	public ModelAndView adicionarCarrinho(@PathVariable Long id) {
-		ModelAndView mv = new ModelAndView("cliente/carrinho");
-		
-		Optional<Produto> prod = repositorioProduto.findById(id);
+
+	@getMapping("/adicionarCarrinho/{id}")
+	public String adicionarCarrinho(@PathVariable Long id) {
+
+		Optional<produto> pro = repositorioProduto.findById(id);
 		Produto produto = prod.get();
-		
+
 		int controle = 0;
-		for(ItensCompra it:itensCompra) {
-			if(it.getProduto().getId().equals(produto.getId())) {
-				it.setQuantidade(it.getQuantidade()+1);
+		for (ItensCompra it : itensCompra) {
+			if (it.getProduto().getId().equals(produto.getId())) {
+				it.setQuantidade(it.getQuantidade() + 1);
+				it.setValorTotal(0.);
+				it.setValorTotal(it.getValorTotal() + (it.getQuantidade() * it.getValorUnitario()));
 				controle = 1;
 				break;
 			}
 		}
-		if(controle == 0) {
-		ItensCompra item = new ItensCompra();
-		ietm.setProduto(produto);
-		item.setValorUnitario(produto.getValorVenda());
-		item.setQuantidade(item.getQuantidade()+1);
-		item.setValorTotal(item.getQuantidade()*item.getValorUnitario());
-		itensCompra.add(item);
+		if (controle == 0) {
+			ItensCompra item = new ItensCompra();
+			item.setProduto(produto);
+			item.setValorUnitario(produto.getValorVenda());
+			item.setQuantidade(item.getQuantidade() + 1);
+			item.setValorTotal(item.getValorTotal() + (item.getQuantidade() * item.getValorUnitario()));
+			itensCompra.add(item);
 		}
-		
-		mv.addObject("listaItens", itensCompra);
-		return mv;
-
+		return "redirect:/carrinho";
 	}
-
 }

@@ -32,10 +32,10 @@ public class ItensCompra implements Serializable {
 	private Compra compra;
 
 	private Integer quantidade;
-
-	private Double valorUnitario;
-
-	private Double valorTotal;
+//inserido
+	private Double valorUnitario=0;
+//inserido
+	private Double valorTotal=0;
 
 	public Double getValorTotal() {
 		return valorTotal;
@@ -68,7 +68,7 @@ public class ItensCompra implements Serializable {
 	public void setCompra(Compra compra) {
 		this.compra = compra;
 	}
-
+//inserido
 	public Integer getQuantidade() {
 		if(quantidade == null) {
 			quantidade = 0;
