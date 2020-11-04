@@ -1,38 +1,45 @@
 package com.example.lojaunitpe;
 
-import javax.sql.DataSource;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.springframework.orm.jpa.vendor.Database;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 @Configuration
-public class DataConfiguration {
+public class  DataConfiguration {
 	
-	@Bean
-	public DataSource dataSource () {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName ("com.mysql.jbc.Driver");
-		dataSource.setUrl ("jdbc:mysql://localhost:3306/lojaunit?use?Timezon=true&serverTimezone=America/Sao_Paulo");
-		dataSource.setUsername("root");
-		dataSource.setPassword("mari");
-		return dataSource;
-	}
-	
-	@Bean
-	public JpaVendorAdapter jpaVendorAdapter () {
-		HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter ();
-		adapter.setDatabase(Database.MYSQL);
-		adapter.setShowSql(true);
-		adapter.setGenerateDdl(true);
-		adapter.setDatabasePlatform ("org.hibernate.dialect.MySQL5Dialect");
-		adapter.setPrepareConnection(true);
-		return adapter;
-	}
-}
 
+@Bean
+    public static void main(String[] args){
+	
+        String driver = "org.postgresql.Driver";
+        String user   = "postgres";
+        String senha = "mari";
+        String url   = "jdbc:postgresql://localhost:5432/lojaUnit";
+
+        try
+        {
+            Class.forName(driver);
+            Connection con = null;
+
+            con = (Connection) DriverManager.getConnection(url, user, senha);
+
+            System.out.println("Conexão realizada com sucesso.");
+
+        }
+        catch (ClassNotFoundException ex)
+        {
+            System.err.print(ex.getMessage());
+        } 
+        catch (SQLException e)
+        {
+            System.err.print(e.getMessage());
+        }
+    }
+}
 
 
 

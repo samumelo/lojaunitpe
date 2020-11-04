@@ -4,12 +4,10 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.core.annotation.Order;
 
 @Configurable
-@EnableWebSecurity
+@EnableWebSecurity 
 @Order(2)
 public class SecurityAdministrativo extends WebSecurityConfigurerAdapter {
 

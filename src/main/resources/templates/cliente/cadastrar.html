@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml"
+	layout:decorate="~{cliente/fragments/layout">
+
+<head>
+
+
+<title>Finalizar Compra</title>
+
+
+</head>
+<body>
+	<!-- Page Content -->
+	<div class="container" layout:fragment="corpo">
+
+		<div class="row">
+			<div class="col-6">
+				<h2>Efetue seu cadastro no Saldão Virtual</h2>
+			</div>
+			<div class="col-6">
+				<h2>Login</h2>
+			</div>
+
+		<div class="col-6">
+					<form action="cliente/salvar" th:object="${cliente}" method="POST">
+				<div class="form-row">
+					<!-- /////////////////////////////nome/////////////////////////////////////////// -->
+					<div class="form-group col-md-12">
+						<label for="nome">Nome do Cliente</label> <input type="text"
+							class="form-control" id="nome" placeholder="Nome Completo"
+							autofocus="autofocus" th:filed="*{nome}" value="" />
+						<div class="invalid-feedback"></div>
+					</div>
+					<!-- /////////////////////////////CPF/////////////////////////////////////////// -->
+					<div class="form-group col-md-6">
+						<label for="cpf">CPF</label> <input type="text"
+							class="form-control" id="cpf" placeholder="CPF"
+							autofocus="autofocus" th:filed="*{cpf}" value="" />
+						<div class="invalid-feedback"></div>
+					</div>
+					<!-- /////////////////////////////cidade/////////////////////////////////////////// -->
+					<div class="form-group col-md-6">
+						<label for="estado">Cidade</label> <select th:field="*{cidade}"
+							class="form-control">
+							<option th:each="cid: ${listaCidades}" th:value="${cid.id}"
+								th:text="${cid.nome}"></option>
+						</select>
+
+						<div class="invalid-feedback"></div>
+					</div>
+					<!-- /////////////////////////////e-mail/////////////////////////////////////////// -->
+					<div class="form-group col-md-6">
+						<label for="email">Email</label> <input type="text"
+							class="form-control" id="email" placeholder="Email"
+							autofocus="autofocus" th:filed="*{email}" value="" />
+						<div class="invalid-feedback"></div>
+					</div>
+					<!-- ////////////////////////////senha//////////////////////////////////////////// -->
+					<div class="form-group col-md-6">
+						<label for="senha">Senha</label> <input type="password"
+							class="form-control" id="nome" placeholder="Senha"
+							autofocus="autofocus" th:filed="*{nome}" value="" />
+						<div class="invalid-feedback"></div>
+					</div>
+
+				</div>
+
+				<input type="hidden" id="id" th:filed="*{id}" value="" />
+				<button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+			</form>
+			
+			
+		</div>	
+		
+		
+<!-- ///////////////////////////////////////////////////////////////////////////////////LoGIN /////////////////////////////////////////// -->
+		
+				<div class="col-6">
+					<form action="/finalizar/login"  method="POST">
+				<div class="form-row">
+								<!-- /////////////////////////////e-mail/////////////////////////////////////////// -->
+					<div class="form-group col-md-12">
+						<label >Email</label> <input type="text" name="username"
+							class="form-control" placeholder="Email"
+							autofocus="autofocus"  value="" />
+						<div class="invalid-feedback"></div>
+					</div>
+					<!-- ////////////////////////////senha//////////////////////////////////////////// -->
+					<div class="form-group col-md-12">
+						<label >Senha</label> <input type="password" name="password"
+							class="form-control" i placeholder="Senha"
+							autofocus="autofocus" value="" />
+						<div class="invalid-feedback"></div>
+					</div>
+
+				</div>
+
+				<button type="submit" class="btn btn-primary btn-sm">Efetuar login</button>
+			</form>
+			
+			
+		</div>
+		</div>
+		<!-- /.row -->
+
+	</div>
+	<!-- /.container -->
+
+</body>
+
+</html>

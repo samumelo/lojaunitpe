@@ -17,7 +17,7 @@ public class LoginControle {
 	
 	
 	@GetMapping ("/login")
-    public ModelAndView cadastrar (Cidade cidade)	{
+    public ModelAndView cadastrar (Login login)	{
 		ModelAndView mv = new ModelAndView ("/login");
 		return mv;
 		

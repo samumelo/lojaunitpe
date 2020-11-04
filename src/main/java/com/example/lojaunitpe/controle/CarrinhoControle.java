@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.authentication.AbstractAuthenticationToken
 
 import com.example.lojaunitpe.modelos.Cliente;
 import com.example.lojaunitpe.modelos.Compra;
@@ -56,7 +57,7 @@ public class CarrinhoControle {
 		}
 	}
 
-	@getMapping("/carrinho")
+	@GetMapping("/carrinho")
 	public ModelAndView chamarCarrinho() {
 		ModelAndView mv = new ModelAndView("cliente/carrinho");
 		calcularTotal();
@@ -73,7 +74,7 @@ public class CarrinhoControle {
 		}
 	}
 
-	@getMapping("/finalizar")
+	@GetMapping("/finalizar")
 	public ModelAndView finalizarCompra() {
 		ModelAndView mv = new ModelAndView("cliente/finalizar");
 		calcularTotal();
@@ -82,7 +83,7 @@ public class CarrinhoControle {
 		return mv;
 	}
 
-	@getMapping("alterarQuantidade/{id}/{acao}")
+	@GetMapping("alterarQuantidade/{id}/{acao}")
 	public String alterarQuantidade(@PathVariable Long id, @PathVariable Integer acao) {
 		ModelAndView mv = new ModelAndView("cliente/carrinho");
 
@@ -103,7 +104,7 @@ public class CarrinhoControle {
 		return "redirect:/carrinho";
 	}
 
-	@getMapping("/removerProduto/{id}")
+	@GetMapping("/removerProduto/{id}")
 	public String removerProduto(@PathVariable Long id) {
 		for (ItensCompra it : itensCompra) {
 			if (it.getProduto().getId().equals(id)) {
@@ -114,12 +115,12 @@ public class CarrinhoControle {
 		return "redirect:/carrinho";
 	}
 
-	@getMapping("/finalizar")
+	@GetMapping("/finalizar")
 	public ModelAndView finalizarCompra() {
 		buscarUsuarioLogado();
 		ModelAndView mv = new ModelAndView("cliente/finalizar");
 		calcularTotal();
-		mv.addObjetct("compra", compra);
+		mv.addObject("compra", compra);
 		mv.addObject("listaItens", itensCompra);
 		mv.addObject("cliente", cliente);
 		return mv;
@@ -142,7 +143,7 @@ public class CarrinhoControle {
 
 	}
 
-	@getMapping("/adicionarCarrinho/{id}")
+	@GetMapping("/adicionarCarrinho/{id}")
 	public String adicionarCarrinho(@PathVariable Long id) {
 
 		Optional<produto> pro = repositorioProduto.findById(id);
